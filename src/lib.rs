@@ -60,7 +60,6 @@ pub extern "C" fn aa_module_new(url: *const c_char, module: *const c_char) -> *m
     let aaunit = aa_wasmtime::AAUnit::new(wasm_bytes).unwrap();
 
     let (sender, receiver) = cb::unbounded();
-
     // load GUI description JSON, if present
     let gui_description = if let Some(gui_desc) = bundle.gui_description {
         let description_url = [url, &gui_desc].join("/");
@@ -94,12 +93,31 @@ pub extern "C" fn aa_module_delete(ptr: *mut AAModule) {
 }
 
 #[no_mangle]
+/// get JSON string for modules
+pub extern "C" fn aa_get_modules(url: *const c_char) -> *const c_char {
+    let url = unsafe { CStr::from_ptr(url).to_str().unwrap() };
+
+    let modules_url = [url, "modules.json"].join("/");
+    if let Ok(json) = get_string(&modules_url) {
+        let s = CString::new(json).unwrap();
+        let p = s.as_ptr();
+        std::mem::forget(s);
+        p
+    }
+    else {
+        std::ptr::null() 
+    }
+}
+
+#[no_mangle]
 /// get JSON string for GUI descripion
 pub extern "C" fn get_gui_description(ptr: *mut AAModule) -> *const c_char {
     let module = to_module(ptr);
     let ptr = if let Some(gui) = &module.gui_description {
         let s = CString::new(gui.clone()).unwrap();
-        s.as_ptr()
+        let p = s.as_ptr();
+        std::mem::forget(s);
+        p
     }
     else {
         std::ptr::null() 
