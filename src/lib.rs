@@ -47,17 +47,38 @@ pub extern "C" fn aa_module_new(url: *const c_char, module: *const c_char) -> *m
     let module = unsafe { CStr::from_ptr(module).to_str().unwrap() };
 
     let bundle_url = [url, module].join("/");
-    let json = get_string(&bundle_url).unwrap();
-    let bundle = Bundle::from_json(&json).unwrap();
+    let json = match get_string(&bundle_url) {
+        Ok(json) => json,
+        Err(_) => {
+            return std::ptr::null_mut();
+        }
+    };
+
+    let bundle = match Bundle::from_json(&json) {
+        Ok(bundle) => bundle,
+        Err(_) => {
+            return std::ptr::null_mut();
+        }
+    };
 
     let mut wasm_bytes = Vec::new();
 
     for wasm_url in bundle.wasm_url.iter() {
-        wasm_bytes.push(get_vec(&[url, &wasm_url].join("")).unwrap());
+        let bytes = match get_vec(&[url, &wasm_url].join("")) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                return std::ptr::null_mut();
+            }
+        };
+        wasm_bytes.push(bytes);
     }
 
-    //let aaunit = Box::into_raw(Box::new(aa_wasmtime::AAUnit::new(wasm_bytes).unwrap()));
-    let aaunit = aa_wasmtime::AAUnit::new(wasm_bytes).unwrap();
+    let aaunit = match aa_wasmtime::AAUnit::new(wasm_bytes) {
+        Ok(aaunit) => aaunit,
+        Err(_) => {
+            return std::ptr::null_mut();
+        }
+    };
 
     let (sender, receiver) = cb::unbounded();
     // load GUI description JSON, if present
