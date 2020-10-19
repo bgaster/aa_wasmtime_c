@@ -173,6 +173,37 @@ void aa_module_compute_zero_one(
   float *outputs);
 ```
 
+### Compute audio for one in and two out
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+* _frames_ - Number of samples to produce
+* _input_ - Pointer to audio input buffer
+* _output0_ - Pointer to audio output buffer 1
+* _output0_ - Pointer to audio output buffer 2
+
+```c++
+void aa_module_compute_one_two_non(AAModule *ptr,
+                                   int frames,
+                                   const float *input,
+                                   float *output0,
+                                   float *output1);
+```
+
+### Compute audio for zero in and two out
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+* _frames_ - Number of samples to produce
+* _output0_ - Pointer to audio output buffer 1
+* _output0_ - Pointer to audio output buffer 2
+
+```c++
+void aa_module_compute_zero_two_non(AAModule *ptr, int frames, float *output0, float *output1);
+```
+
 # License
 © 2020 [Benedict R. Gaster (cuberoo_)](https://bgaster.github.io/)
 

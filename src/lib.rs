@@ -238,6 +238,26 @@ pub extern "C" fn aa_module_compute_zero_one(ptr: *mut AAModule, frames: c_int, 
 
 #[no_mangle]
 // compute process for single audio output
+pub extern "C" fn aa_module_compute_one_two_non(
+    ptr: *mut AAModule, frames: c_int, input: *const c_float, output0: *mut c_float, output1: *mut c_float) {
+    let module = to_module(ptr);
+    handle_commands(module);
+    
+    let (output0, output1) = unsafe {
+        assert!(!output0.is_null() && !output1.is_null());
+		(::std::slice::from_raw_parts_mut(&mut *output0, frames as usize),
+		 ::std::slice::from_raw_parts_mut(&mut *output1, frames as usize))
+    };
+
+    let inputs = unsafe { 
+        std::slice::from_raw_parts(input, frames as usize)
+    };
+
+    let _ = module.aaunit.compute_one_two_non(frames as usize, inputs, &mut[output0, output1]);
+}
+
+#[no_mangle]
+// compute process for single audio output
 pub extern "C" fn aa_module_compute_zero_two_non(
     ptr: *mut AAModule, frames: c_int, output0: *mut c_float, output1: *mut c_float) {
     let module = to_module(ptr);
