@@ -1,7 +1,6 @@
 // Desc:
 //   C Wrapper around Audio Anywhere Rust Wasm interface
 // 
-
 extern crate aa_wasmtime;
 
 extern crate crossbeam_channel;
@@ -18,18 +17,22 @@ use crate::bundle::*;
 
 #[derive(Debug, Clone, Copy)]
 enum Command {
+    /// node, index, value param message
     Param(u32, u32, f32),
+    /// note on (pitch, velocity) message
     NoteOn(i32, f32),
+    /// note off (pitch, velocity) message
     NoteOff(i32, f32),
 }
 
-//#[repr(C)]
 pub struct AAModule {
+    /// send command to audio thread
     sender: cb::Sender<Command>, 
+    /// receive command on audio thread
     receiver: cb::Receiver<Command>,
     /// wasmtime AA unit, representation of an AA module
-    //aaunit: *mut aa_wasmtime::AAUnit,
     aaunit: aa_wasmtime::AAUnit,
+    /// opitonal json for GUI description
     gui_description: Option<String>,
 }
 
@@ -215,8 +218,8 @@ fn handle_commands(module: &mut AAModule) {
 }
 
 #[no_mangle]
+// compute process for single audio output
 pub extern "C" fn aa_module_compute_zero_one(ptr: *mut AAModule, frames: c_int, outputs: * mut c_float) {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
 
     handle_commands(module);
