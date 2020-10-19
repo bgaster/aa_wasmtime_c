@@ -1,6 +1,6 @@
-// Desc:
-//   C Wrapper around Audio Anywhere Rust Wasm interface
-// 
+//! Desc:
+//!   C Wrapper around Audio Anywhere Rust Wasm interface
+//! 
 extern crate aa_wasmtime;
 
 extern crate crossbeam_channel;

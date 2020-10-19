@@ -27,6 +27,152 @@ This produces:
  * aa_wasmtime_c.h
  * target/release/libaa_wasmtime_c.a
 
+## API
+
+###  Create an Audio Anywhere module instance
+
+Returns a pointer to an _AAModule_, if successful, otherwise null.
+
+Arguments
+
+* _url_ - URL for Audio Anywhere server
+* _module_ - Module to load
+
+```c++
+AAModule *aa_module_new(
+  const char *url, 
+  const char *module);
+```
+
+### Delete memory for previously allocated AA module
+
+Arguments
+
+* _ptr_ - Previously allocated AA module
+
+```c++
+void aa_module_delete(AAModule *ptr);
+```
+
+```c++
+const char *aa_get_modules(const char *url);
+```
+
+### Get GUI description JSON
+
+Returns JSON for optional GUI description assocated with loaded
+module, otherwise null.
+
+Arguments
+
+* _ptr_ - A previously allocated AA module.
+
+```c++
+const char *get_gui_description(AAModule *ptr);
+```
+
+### Initalize module
+
+Arguments
+
+* _ptr_ - A previously allocated AA module.
+* _sample\_rate_ - Audio sample rate. If sample rate changes, module must be re-initialized.
+
+```c++
+void aa_module_init(AAModule *ptr, double sample_rate);
+```
+
+### Set parameter
+
+Arguments
+
+* _ptr_ - A previously allocated AA module.
+* _node_ - Node index within audio graph
+* _index_ - Parameter index within node
+* _param_ - Parameter value
+
+```c++
+void set_param_float(
+  AAModule *ptr, 
+  unsigned int node, 
+  unsigned int index, 
+  float param);
+```
+
+### Handle note on message
+
+Currently, timing is at the buffer level and not per sample. (This will be changed in the near future.)
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+* _note_ - MIDI note
+* _velocity_ - Velocity of note press, between 0.0 - 1.0
+
+```c++
+void aa_module_handle_note_on(
+  AAModule *ptr, 
+  int note, 
+  float velocity);
+```
+
+### Handle note off message
+
+Currently, timing is at the buffer level and not per sample. 
+(This will be changed in the near future.)
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+* _note_ - MIDI note
+* _velocity_ - Velocity of note press, between 0.0 - 1.0
+
+```c++
+void aa_module_handle_note_off(
+  AAModule *ptr, 
+  int note, 
+  float velocity);
+```
+
+### Number of audio inputs
+
+Returns the number of audio inputs for module.
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+
+```c++
+int aa_module_get_number_inputs(AAModule *ptr);
+```
+
+### Number of audio outputs
+
+Returns the number of audio outputs for module.
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+
+```c++
+int aa_module_get_number_outputs(AAModule *ptr);
+```
+
+### Compute audio for zero in and one out
+
+Arguments 
+
+* _ptr_ - A previously allocated AA module.
+* _frames_ - Number of samples to produce
+* _outputs_ - Pointer to audio output buffer
+
+```c++
+void aa_module_compute_zero_one(
+  AAModule *ptr, 
+  int frames, 
+  float *outputs);
+```
+
 # License
 © 2020 [Benedict R. Gaster (cuberoo_)](https://bgaster.github.io/)
 
