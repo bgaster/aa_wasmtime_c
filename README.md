@@ -24,7 +24,7 @@ cargo build --release
 ```
 This produces:
 
- * aa_wasmtime_c.h
+ * dist/aa_wasmtime_c.h
  * target/release/libaa_wasmtime_c.a
 
 ## API
