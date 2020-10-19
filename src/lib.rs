@@ -7,20 +7,14 @@ extern crate aa_wasmtime;
 extern crate crossbeam_channel;
 use crossbeam_channel as cb;
 
-//use std::ffi::CStr;
 use libc::{c_char, c_int, c_float, c_double, c_uint};
 use std::ffi::{CStr, CString};
-
-//use anyhow::{Result, anyhow};
-
 
 mod utils;
 mod bundle;
 
 use crate::utils::*;
 use crate::bundle::*;
-
-//use aa_wasmtime::*;
 
 #[derive(Debug, Clone, Copy)]
 enum Command {
@@ -146,17 +140,6 @@ pub extern "C" fn get_gui_description(ptr: *mut AAModule) -> *const c_char {
     ptr
 }
 
-// #[inline]
-/// convert a mutable pointer to AAModule into a mutable reference 
-// fn to_aaunit<'a>(ptr: *mut AAModule) -> &'a mut aa_wasmtime::AAUnit {
-//     unsafe {
-//         assert!(!ptr.is_null());
-//         let module = &mut *ptr;
-//         assert!(!module.aaunit.is_null());
-//         &mut *module.aaunit
-//     }
-// }
-
 fn to_module<'a>(ptr: *mut AAModule) -> &'a mut AAModule {
     unsafe {
         assert!(!ptr.is_null());
@@ -164,20 +147,10 @@ fn to_module<'a>(ptr: *mut AAModule) -> &'a mut AAModule {
     }
 }
 
-// #[inline]
-// fn to_channels<'a>(ptr: *mut (cb::Sender<Command>, cb::Receiver<Command>)) -> 
-//                                     &'a mut (cb::Sender<Command>, cb::Receiver<Command>) {
-//     unsafe {
-//         assert!(!ptr.is_null());
-//         &mut *ptr
-//     }
-// }
-
 #[no_mangle]
 /// init AA module
 /// not thread safe
 pub extern "C" fn aa_module_init(ptr: *mut AAModule, sample_rate: c_double) {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     let _ = module.aaunit.init(sample_rate);
 }
@@ -185,36 +158,28 @@ pub extern "C" fn aa_module_init(ptr: *mut AAModule, sample_rate: c_double) {
 #[no_mangle]
 /// set param for node in graph
 pub extern "C" fn set_param_float(ptr: *mut AAModule, node: c_uint, index: c_uint, param: c_float) {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     let _ = module.sender.send(Command::Param(node, index, param));
-    
-    //let _ = aaunit.set_param_float(node, index, param);
 }
 
 #[no_mangle]
 /// handle note on 
 pub extern "C" fn aa_module_handle_note_on(ptr: *mut AAModule, note: c_int, velocity: c_float) {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     let _ = module.sender.send(Command::NoteOn(note, velocity));
-    //let _ = aaunit.handle_note_on(note, velocity);
 }
 
 #[no_mangle]
 /// handle note off
 pub extern "C" fn aa_module_handle_note_off(ptr: *mut AAModule, note: c_int, velocity: c_float) {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     let _ = module.sender.send(Command::NoteOff(note, velocity));
-    //let _ = aaunit.handle_note_off(note, velocity);
 }
 
 #[no_mangle]
 /// number of audio inputs
 /// not thread safe
 pub extern "C" fn aa_module_get_number_inputs(ptr: *mut AAModule) -> c_int {
-    // let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     match module.aaunit.get_number_inputs() {
         Ok(v) => v,
@@ -226,7 +191,6 @@ pub extern "C" fn aa_module_get_number_inputs(ptr: *mut AAModule) -> c_int {
 /// number of audio outputs
 /// not thread safe
 pub extern "C" fn aa_module_get_number_outputs(ptr: *mut AAModule) -> c_int {
-    //let aaunit = to_aaunit(ptr);
     let module = to_module(ptr);
     match module.aaunit.get_number_outputs() {
         Ok(v) => v,
