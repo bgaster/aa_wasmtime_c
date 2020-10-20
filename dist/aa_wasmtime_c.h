@@ -43,6 +43,8 @@ int aa_module_get_number_outputs(AAModule *ptr);
 
 void aa_module_compute_zero_one(AAModule *ptr, int frames, float *outputs);
 
+void aa_module_compute_one_one(AAModule *ptr, int frames, const float *inputs, float *outputs);
+
 void aa_module_compute_one_two_non(AAModule *ptr,
                                    int frames,
                                    const float *input,
