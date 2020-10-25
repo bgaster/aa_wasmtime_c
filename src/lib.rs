@@ -286,6 +286,35 @@ pub extern "C" fn aa_module_compute_one_two_non(
 }
 
 #[no_mangle]
+// compute process for two input and two output audio (non interlaced)
+pub extern "C" fn aa_module_compute_two_two_non(
+    ptr: *mut AAModule, 
+    frames: c_int, 
+    input0: *const c_float, 
+    input1: *const c_float, 
+    output0: *mut c_float, 
+    output1: *mut c_float) {
+    let module = to_module(ptr);
+    handle_commands(module);
+    
+    let (input0, input1) = unsafe {
+        assert!(!output0.is_null() && !output1.is_null());
+		(::std::slice::from_raw_parts(&*input0, frames as usize),
+		 ::std::slice::from_raw_parts(&*input1, frames as usize))
+    };
+
+    let (output0, output1) = unsafe {
+        assert!(!output0.is_null() && !output1.is_null());
+		(::std::slice::from_raw_parts_mut(&mut *output0, frames as usize),
+		 ::std::slice::from_raw_parts_mut(&mut *output1, frames as usize))
+    };
+
+    let _ = module.aaunit.compute_two_two_non(
+        frames as usize, &[input0, input1], &mut[output0, output1]);
+}
+
+
+#[no_mangle]
 // compute process for single audio output
 pub extern "C" fn aa_module_compute_zero_two_non(
     ptr: *mut AAModule, frames: c_int, output0: *mut c_float, output1: *mut c_float) {

@@ -51,6 +51,13 @@ void aa_module_compute_one_two_non(AAModule *ptr,
                                    float *output0,
                                    float *output1);
 
+void aa_module_compute_two_two_non(AAModule *ptr,
+                                   int frames,
+                                   const float *input0,
+                                   const float *input1,
+                                   float *output0,
+                                   float *output1);
+
 void aa_module_compute_zero_two_non(AAModule *ptr, int frames, float *output0, float *output1);
 
 } // extern "C"
